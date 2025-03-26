@@ -20,25 +20,27 @@ In the following general equation:
     y ~ x
 
 Y is normally referred to as:  
-  - Response variable  
-  - Dependent variable  
-  - Predicted variable  [y variable is referred as predicted variable in machine learning]
+  - Response variable [used to refer y in experimental design type of analysis]  
+  - Dependent variable [used to refer y in experimental design type of analysis] 
+  - Predicted variable  [y variable is referred as "predicted" variable in machine learning]
 
 X is normally referred to as:  
-  - Explanatory variable  
-  - Independent variable  
-  - Predictor variable  [x variable is referred as predictor variable in machine learning]
+  - Explanatory variable [used to refer x in experimental design type of analysis]  
+  - Independent variable [used to refer x in experimental design type of analysis]  
+  - Predictor variable  [x variable is referred as "predictor" variable in machine learning]
 
 ## What is multivariate analysis?  
 
 Most common: multiple Xs (predictors)  
 
                y ~ x1 + x2 + .... xn  
-               yield ~ precip + temp + som + hybrid  [yield explained by precipitation, temperature, soil organic matter, hybrid]
+               yield ~ precip + temp + som + hybrid  [yield explained by precipitation, temperature, soil organic matter, and hybrid]
     
 Perhaps multiple Xs (predictors) without a Y (outcome)  
 
               ~ x1 + x2 + .... xn
+
+Very Important Note: When we do NOT have any y (predicted) variable, we are not trying to predict something specific (since there are no  y variable), we are just trying to look for pattern on your x (predictor) variables.
 
 While some can have multiple Ys (outcomes)  
 
@@ -54,7 +56,7 @@ Commonly not a "designed experiment" analysis, but an exploratory relationship a
 
 ## Main types of multivariate  
 - Dimensionality reduction  
-    - **Principal component analysis (PCA)**  
+    - **Principal component analysis (PCA)**  [Note: PCA is used when we have many dimensions i.e., a column/variable in our dataframe. For the weather data frame that we previously worked on, we have 72 dimensions/columns/variables that we obtained through feature engineering. For this feature engineered data frame, we can conduct dimensionality reduction technique such as PCA to our dataframe, if we wanted]   
     - Principal coordinate analysis (PCoA)  
     - Factor analysis  
     
@@ -62,11 +64,13 @@ Commonly not a "designed experiment" analysis, but an exploratory relationship a
     - **k-means**, c-means, x-means  
     - Non-numerical multidimensional scaling  
     - nearest neighbor  
+
+[Note: the listed clustering algorithms do not take y variable, only takes x variables]
   
 - Relationship between variables / Prediction  
   - Multiple linear regression/stepwise regression  
-  - **Random forest**    
-  - **Conditional inference tree**  
+  - **Random forest** [very popular machine learning algorithm that we learn in this class]   
+  - **Conditional inference tree** [very popular machine learning algorithm that we learn in this class]   
 
 ## A few ways to characterize multivariate analysis  
 - Based on analysis goal:  
@@ -76,12 +80,15 @@ Commonly not a "designed experiment" analysis, but an exploratory relationship a
   - Establish significant relationships among multiple predictors and an outcome.  
 
 - Based on Y (outcome) existence:
-    - Supervised  [we give the y variable (aka label) i.e., we have the y variable that we are trying predict]
-    - Unsupervised  [we do not have the y variable (aka label)/ no label]
+    - Supervised  
+[Note: in supervised, we have the y variable, so we are giving label (= y variable) to the algorithm. It is supervised because the learning of the algorithm is being supervised based on the y variable/label. we give the y variable (aka label) i.e., we have the y variable that we are trying predict]  
+
+    - Unsupervised  
+[Note: We do not give/have the y variable (aka label)/ no label. Clustering is unsupervised]
 
 - If Y exists (i.e., supervised learning), based on its type:  
-    - Categorical: classification (e.g., low, high of a variable)  
-    - Numerical (continuous variable): regression  
+    - Categorical: classification [e.g., low, high level of a y variable (= fiber strength)]    
+    - Numerical: regression [y variable is a continuous numerical variable]  
 
 # Setup  
 ```{r}
@@ -93,11 +100,11 @@ Commonly not a "designed experiment" analysis, but an exploratory relationship a
 #install.packages("ggpmisc")
 
 library(tidyverse)
-library(ggcorrplot)
+library(ggcorrplot) #helps to look into correlation of variables
 library(broom)
 library(car)
-library(factoextra)
-library(ggpmisc)
+library(factoextra) #helps to look into some clustering functions
+library(ggpmisc) #helps make annotations in ggplots
 ```
 
 ```{r}
