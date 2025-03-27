@@ -156,11 +156,12 @@ ggsave("../output/corrmat.png",
 A bit difficult to see because we have so many predictors, let's extract in table format.  
 
 ```{r highest correlations}
+
 weather %>%
   dplyr::select(-year, -site) %>%
   cor() %>% # calculates r (-1 to 1)
   as.data.frame() %>%
-  rownames_to_column() %>%
+  rownames_to_column() %>% #to turn the rownames into a column
   pivot_longer(cols = -rowname) %>%
   filter(abs(value) > .85 & value != 1) %>%
   arrange(desc(value)) %>%
@@ -169,6 +170,7 @@ weather %>%
 ```
 
 ```{r lowest correlations}
+
 weather %>%
   dplyr::select(-year, -site) %>%
   cor() %>% # calculates r (-1 to 1)
@@ -184,6 +186,32 @@ weather %>%
 How do variables relate to fiber strength in a bivariate relationship?  
 
 ```{r r2}
+
+test <- weather %>%
+  dplyr::select(-site, -year) %>%
+  pivot_longer(cols=-strength_gtex) %>%
+  group_by(name) %>%
+  nest() %>%
+  mutate(r2 = map_dbl(data,
+                  ~lm(strength_gtex ~ value,
+                      data = .x) %>%
+                    glance(.) %>% #Extracts model metrics from any model
+                    pull(r.squared)
+                  )) %>% #map_dbl() return a double
+  arrange(desc(r2))
+
+
+test$data[[1]] %>%
+  lm(strength_gtex ~ value,
+     data = .) %>%
+  glance(.)  %>% 
+  pull(r.squared)
+
+```
+
+
+```{r r2}
+
 weather %>%
   dplyr::select(-site, -year) %>%
   pivot_longer(cols=-strength_gtex) %>%
@@ -192,15 +220,15 @@ weather %>%
   mutate(r2 = map_dbl(data,
                   ~lm(strength_gtex ~ value,
                       data = .x) %>%
-                    glance(.) %>%
+                    glance(.) %>% #Extracts model metrics from any model
                     pull(r.squared)
-                  )) %>%
+                  )) %>% #map_dbl() return a double
   arrange(desc(r2))
-
 
 ```
 
 ```{r r2 plot}
+
 weather %>%
   dplyr::select(-site, -year) %>%
   pivot_longer(cols=-strength_gtex) %>%
@@ -233,7 +261,7 @@ weather %>%
 
 # Multicollinearity 
 ## Concepts  
-Multicollinearity definition: more than two explanatory variables in a multiple regression model are highly linearly related.  
+Multicollinearity definition: more than two explanatory variables [i.e., predictor variables] in a multiple regression model are highly linearly related.  
 
 
 Multicollinearity is an issue because:  
@@ -247,16 +275,25 @@ Multicollinearity is an issue because:
 Let's select a few variables to run some tests.  
 Two uncorrelated variables:
 ```{r uncorrelated}
+
+#install.packages("ggpmisc")
+#library(ggpmisc)
+
 weather %>%
   ggplot(aes(x = mean_dayl.s_Apr, 
              y = sum_prcp.mm_Oct)) +
   geom_point() +
   geom_smooth(method="lm") +
-  stat_correlation()
+  stat_correlation(parse = F)
+
+?stat_correlation()
+
 ```
 
-Two correlated variables:
+Two correlated variables:  
+
 ```{r correlated}
+
 weather %>%
   ggplot(aes(x = mean_dayl.s_Apr, 
              y = mean_dayl.s_May))+
@@ -268,13 +305,20 @@ weather %>%
 Now let's fit some models with one or two uncorrelated and correlated variables explaining fiberstrength and see what happens.  
 
 ```{r strength ~ mean_dayl.s_Apr}
-lm_dayl.apr 
+
+lm_dayl.apr <- lm(strength_gtex ~ mean_dayl.s_Apr, 
+                  data = weather
+                  ) %>%
+  tidy() %>% #gives us the estimates i.e., (Intercept) and the slope (= mean_dayl.s_Apr)
+  filter(term != "(Intercept)") %>%
+  mutate(mod = "lm_dayl.apr")
 
 lm_dayl.apr
 
 ```
 
 ```{r strength ~ sum_prcp.mm_Oct}
+
 lm_prp.oct <- lm(strength_gtex ~ sum_prcp.mm_Oct,
    data = weather) %>%
   tidy() %>%
@@ -282,9 +326,11 @@ lm_prp.oct <- lm(strength_gtex ~ sum_prcp.mm_Oct,
   mutate(mod="lm_prp.oct")
 
 lm_prp.oct
+
 ```
 
 ```{r strength ~ mean_dayl.s_Apr + sum_prcp.mm_Oct}
+
 lm_dayl.prcp <- lm(strength_gtex ~ mean_dayl.s_Apr + 
                    sum_prcp.mm_Oct,
    data = weather) %>%
@@ -297,12 +343,13 @@ lm_dayl.prcp
 ```
 
 ```{r strength ~ mean_dayl.s_Apr + mean_dayl.s_May}
+
 lm_daylapr.daylmay <- lm(strength_gtex ~ mean_dayl.s_Apr + 
                   mean_dayl.s_May,
    data = weather) %>%
   tidy() %>%
   filter(term!="(Intercept)") %>%
-  mutate(mod="lm_2var.cor")
+  mutate(mod="lm_2var.cor") #linear model with 2 variables correlated
 
 lm_daylapr.daylmay
 
@@ -319,13 +366,19 @@ lm_dayl.apr %>%
                              "lm_2var.uncor",
                              "lm_2var.cor"))) %>%
   filter(term != "mean_dayl.s_May") %>%
-  ggplot(aes(x=mod))
+  ggplot(aes(x=mod)) +
+  geom_pointrange(aes(y = estimate,
+                      ymin = estimate - std.error,
+                      ymax = estimate + std.error
+                      )) +
+  facet_wrap(~ term, scales = "free_y") + #scales = "free_y": to auto-adjust the scales of y axis
+  scale_x_discrete(guide = guide_axis(n.dodge = 2))
 
 ```
 
-What has happened with **mean_dayl.s_April** and **sum_prcp.mm_Oct** estimates and standard error when modeled i) alone, or with another uncorrelated variable vs. ii) with another correlated variable?
+What has happened with **mean_dayl.s_April** and **sum_prcp.mm_Oct** estimates and standard error when modeled i) alone, or with another uncorrelated variable vs. ii) with another correlated variable?  
 
-One way to check the degree of multicollinearity between two predictos is with the variance inflation factor (VIF).  
+One way to check the degree of multicollinearity between two predictos is with the *Variance Inflation Factor (VIF)*.  
 
 VIF values range from 1 to positive infinite.  
 General rule of thumb:  
@@ -334,13 +387,21 @@ General rule of thumb:
 - VIF between 1 and 5: moderate multicollinearity  
 - VIF > 5: severe multicollinearity  
 
-Let's check the variance inflation factor (VIF) of both uncorrelated and correlated models
+Let's check the variance inflation factor (VIF) of both uncorrelated and correlated models  
+
 ```{r vif uncorrelated}
+
 # Uncorrelated
+lm(strength_gtex ~ mean_dayl.s_Apr + 
+                  sum_prcp.mm_Oct,
+   data = weather) %>%
+  vif()
+
 ```
 
 
 ```{r vif correlated}
+
 # Correlated
 lm(strength_gtex ~ mean_dayl.s_Apr + 
                   mean_dayl.s_May,
