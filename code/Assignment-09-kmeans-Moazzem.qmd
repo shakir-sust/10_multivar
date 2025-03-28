@@ -1,6 +1,6 @@
 ---
 title: "Assignment 9 - K-means"
-author: "YOUR NAME HERE"  
+author: "Md Shakir Moazzem"  
 format:
   html:
     code-fold: true 
@@ -29,6 +29,56 @@ You will first need to watch (and code along with) the following k-means video:
   - Move this script into the `code` subfolder of your `10_multivar` project  
   - On this script, fill your name under the `title` section of the YAML  
   - Go back to the class k-means script, choose a different number of k than what we did in class, and run it.    
+# Setup  
+```{r}
+#| message: false
+#| warning: false
+
+#install.packages("ggcorrplot")
+#install.packages("factoextra")
+#install.packages("ggpmisc")
+
+library(tidyverse)
+library(ggcorrplot)
+library(broom)
+library(car)
+library(factoextra)
+library(ggpmisc)
+```
+
+
+# Importing data  
+
+```{r}
+weather <- read_csv("../data/weather_monthsum.csv")
+
+weather
+```
+
+# Data warngling
+
+## Selecting only numerical variables
+
+```{r selecting only numerical vars}
+weather_n <- weather %>%
+  dplyr::select(-c(year:strength_gtex))
+
+weather_n
+```
+
+## Normalizing data
+
+```{r}
+
+# normalizing the data
+weather_norm  <- weather_n %>%
+  mutate(across(everything(), ~scale(.)) )
+
+weather_norm
+
+summary(weather_norm) #Very important note: in the normalized data frame, the mean of all the variables are 0 [i.e., the mean of all variables are standardized around 0]
+
+```
 
 # Questions  
 ## 1. What number of k did you select? Why?  

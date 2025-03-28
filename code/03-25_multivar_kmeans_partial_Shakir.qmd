@@ -29,13 +29,17 @@ library(factoextra)
 library(ggpmisc)
 ```
 
+
+# Importing data  
+
 ```{r}
-weather 
+weather <- read_csv("../data/weather_monthsum.csv")
 
 weather
 ```
 
-Since k-means only take numerical variables, let's select them now.  
+Since k-means only take numerical variables, let's select them now. 
+
 ```{r selecting only numerical vars}
 weather_n <- weather %>%
   dplyr::select(-c(year:strength_gtex))
