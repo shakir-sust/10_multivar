@@ -130,19 +130,30 @@ Since the choice of k can be subjective, we will need to find an objective way t
 
 # Total error x k
 
+fviz_nbclust(weather_norm,
+             method = "wss", #wss = Within Sum of Squares method
+             k.max = 10,
+             FUNcluster = kmeans #To specify what is the function that we want to use find those clusters
+             )
 
 
 ```
 
+The plot in the output is referred as the elbow method. The goal here is to choose a number of k where you see an elbow. That elbow -- we can start at k = 3 -- anywhere between 3 and 5 would be a good guess for the best number of clusters if we are just visually assessing that. But it is really where the elbow (break point) happens on the plot because we do want to choose the number of clusters after which you don't gain as much information if we add extra clusters. Normally, our goal here is to find the minimum number of clusters that explain the most information.  
 
 ```{r choosing k - silhouette}
+
 # Silhouette width
+
 fviz_nbclust(weather_norm, 
-             method = "s",
+             method = "s", #"s" stands for silhouette width
              k.max = 10,
              FUNcluster = kmeans) 
 
+
 ```
+
+Silhouette width is a very popular metric to select the number of clusters. In the Silhouette plot, we want the "Average silhouette width" to be as high as possible, because it means that our observations in that cluster have a larger level of similarity within the cluster. In this case, the algorithm is recommending us to have 4 number of clusters which matches with the highest silhouette width within the number of k's that we created.
 
 total error: k=3-4  
 silhouette: k=4  
@@ -150,24 +161,39 @@ silhouette: k=4
 Let's go with 4 clusters.  
 
 ```{r mod_km4 }
-mod_km4 
+
+mod_km4 <- kmeans(weather_norm,
+                  centers = 4, #now we have 4 clusters instead of 6
+                  nstart = 10
+                  )
 
 mod_km4
+
 ```
 
-How many observations per cluster?
+How many observations per cluster?  
+
 ```{r}
 
+weather %>%
+  mutate(cluster = mod_km4$cluster) %>% #to create a column with cluster id
+  dplyr::select(year, site, cluster) %>%
+  group_by(cluster) %>%
+  tally() #To get the length of each of the cluster
+
 ```
 
-Now how can we visually inspect the resutls of k-means?  
+Now how can we visually inspect the results of k-means?  
+
 We can either  
 
 - add the cluster column to original dataset and explore the distribution of each variable against cluster id, OR  
 
 - use a function that summarises all the original variables into PCs and plots the cluster ids.  
 
+
 ```{r cluster x variable boxplots}
+
 weather %>%
   mutate(cluster = mod_km4$cluster,
          cluster = factor(cluster)) %>%
@@ -192,6 +218,10 @@ We could actually run ANOVA models for each original variable of the form
 and extract cluster mean and pairwise comparison to understand what variables had significant differences among clusters.  
 
 ```{r kmeans PCA plot}
+
+fviz_cluster(mod_km4,
+             data = weather_norm
+             )
 
 ```
   
