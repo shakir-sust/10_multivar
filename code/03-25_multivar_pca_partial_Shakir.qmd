@@ -552,7 +552,8 @@ Let's check the eigenvectors for both PCs 1 and 2 variables:
 fviz_pca_var(mod_pca, 
              col.var = "contrib", # Color by contributions to the PC
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
-             repel = TRUE     # Avoid text overlapping
+             repel = TRUE,     # Avoid text overlapping,
+             select.var = list(contrib = 5) #What does this line do? Ask Dr. Bastos #used in last year's class code
              )
 
 ```
@@ -616,7 +617,7 @@ vif(lm_pca) #All PC 's are orthogonal or independent PC s which is one of the ma
 
 ```
 
-```{r pca regression plots}
+```{r PC1 pca regression plots}
 
 # Plotting strength vs PC1
 ggplot(weather_postpca,
@@ -630,7 +631,7 @@ ggplot(weather_postpca,
 ```
 
 
-```{r pca regression plots}
+```{r PC2 pca regression plots}
 # Plotting strength vs PC2
 ggplot(weather_postpca, 
        aes(x = PC2, y = strength_gtex))+
@@ -639,7 +640,7 @@ ggplot(weather_postpca,
 
 ```
 
-```{r pca regression plots}
+```{r PC3 pca regression plots}
 
 # Plotting strength vs PC3
 ggplot(weather_postpca, 
@@ -649,9 +650,21 @@ ggplot(weather_postpca,
 
 ```
 
+```{r PC4 pca regression plots}
+
+# Plotting strength vs PC3
+ggplot(weather_postpca, 
+       aes(x = PC4, y = strength_gtex))+
+  geom_point()+
+  geom_smooth(method = "lm")
+
+```
+
 Only PCs 2 and 3 explained strength (look at which variables were most important to each PC for interpretation).  
 
 As expected, PCs were not multicollinear (VIF=1).  
+
+Note: Each Principal Component is a linear combination of all the 72 original variables. The number of the Principal Components that we get is equal to the number of original variables, so we have 72 total Principal Components. Always PC1 explains the most variability, and that decreases as the number of PCs increases.
 
 # Summary  
 In this exercise, we covered:  

@@ -7,6 +7,10 @@ format: html
 Our learning objectives are to:  
   - Run k-means for clustering  
 
+You will need to watch (and code along with) the following k-means video:
+
+  - k-means lab: https://youtu.be/GFgMp5tYiMU?si=CI0E-2r-cYZLGVL1 (start from beginning of video, watch till the 01:10)  
+  - The partial script for the video above is in our GitHub repository, 04-classcode, **03-25_multivar_kmeans_partial.qmd**. Move the script mentioned above into the `code` subfolder of your `10_multivar` project
 
 # Setup  
 ```{r}
@@ -42,6 +46,12 @@ weather_n
 # EDA  
 The EDA here is the same as for the PCA script, refer to that if needed.
 
+# Difference between supervised and unsupervised algorithms:
+
+***Supervised algorithm:*** We provide the y variable (aka label in ML) that we are trying to predict to the algorithm. We give the information on y variable that we are trying to predict to the model. E.g., we are trying to predict fiber strength using all 72 weather realated variables. Since fiber strength is the y variable on the formula, this is the supervised algorithm because we are giving the y variable to the algorithm. 
+
+***Unsupervised algorithm:*** We do not provide the y variable (aka label in ML) [Along with k-means, PCA is one example of unsupervised because no y variable was given in PCA]
+
 # k-means  
 k-means is an **unsupervised** clustering algorithm and partitions the data into k groups, where k is defined by the user.  
 
@@ -63,13 +73,14 @@ k-means:
 - Is used for clustering  
 - Is an unsupervised analysis (no outcome)  
 - Only takes predictors  
-- Predictors need to be numerical  
-- Does not handle NAs  
+- Predictors need to be numerical (no categorical variables)  
+- *Does not handle NAs i.e., missing values* 
 
 
-k-means is useful when clusters are circular, but can fail badly when clusters have odd shapes or outliers.  
+*k-means is useful when clusters are circular, but can fail badly when clusters have odd shapes or outliers.*    
 
 ```{r clustering algorithms comparison}
+
 knitr::include_graphics("https://miro.medium.com/max/1400/1*oNt9G9UpVhtyFLDBwEMf8Q.png")
 
 ```
@@ -77,26 +88,49 @@ knitr::include_graphics("https://miro.medium.com/max/1400/1*oNt9G9UpVhtyFLDBwEMf
 k-means does not normalize our data for us like PCA did, so we will need to do that before running the model.  
 
 ```{r}
+
 # normalizing the data
-weather_norm  
+weather_norm  <- weather_n %>%
+  mutate(across(everything(), ~scale(.)) )
 
 weather_norm
+
+summary(weather_norm) #Very important note: in the normalized data frame, the mean of all the variables are 0 [i.e., the mean of all variables are standardized around 0]
+
 ```
 
-Also, we need to define the number of clusters we want.  
-Any thoughts?  
+Also, we need to define the number of clusters we want.    
+
+Any thoughts?   
+
+Answer: Based on the "Individuals - PCA Plot" generated in the "PC1 vs PC2" code chunk of "03-25_multivar_pca_partial_Shakir.qmd" code script, we can visualize the possibility of 6 clusters. 
+
 Let's try 2.  
 
+# Very Important Note:
+
+The 1st step of every kmeans run of the algorithm is that it's gonna pull 6 random observations (because we have 6 centers) from our dataset, and have those as starting centers of the clusters, and then it's gonna iterate to find the best solution. But the 1st step was always a random selection of 6 observations. Because it has this randomness component to it, it could happne that we may -- by random chance -- select 6 of the observations that are from the same specific place of the 72 dimensional place of our data, that once kmeans finishes the exercise, it may not find the actual most appropriate center of those clusters. Let's say, If our 6 random cluster centers are all clustered on 1 side of the data distribution, it may be difficult for us to spread them out in a way that makes sense and find all the proper cluster centers. Again, it has the randomness component in the 1st step, and for us to avoid that we get an answer from kmeans that was impacted/affected by the random selection of the initial centers. "nstart" here just makes sure that it runs kmeans 10 times. So, what we saw on the .GIF from step 0 to step 12 was 1 full run. By specifying "nstart = 10", we are asking kmeans to repeat these steps 10 times in a way if some of these 10 full runs gives us a suboptimal center of the clusters, it's still gonna return us the best results from these 10 runs so that we do not fall victim to the randomness side of the 1st step if run 1 time/ 1 full run. In short, by specifying "nstart = 10", it's doing the kmeans steps 10 times, and returning us the best results across those 10 attempts.  
+
 ```{r kmeans model }
-mod_km 
+
+mod_km <- kmeans(weather_norm,
+                 centers = 6,
+                 nstart = 10 
+                 )
+
+#The 1st step of every kmeans run of the algorithm is that it's gonna pull 6 random observations (because we have 6 centers) from our dataset, and have those as starting centers of the clusters, and then it's gonna iterate to find the best solution. But the 1st step was always a random selection of 6 observations. Because it has this randomness component to it, it could happne that we may -- by random chance -- select 6 of the observations that are from the same specific place of the 72 dimensional place of our data, that once kmeans finishes the exercise, it may not find the actual most appropriate center of those clusters. Let's say, If our 6 random cluster centers are all clustered on 1 side of the data distribution, it may be difficult for us to spread them out in a way that makes sense and find all the proper cluster centers. Again, it has the randomness component in the 1st step, and for us to avoid that we get an answer from kmeans that was impacted/affected by the random selection of the initial centers. "nstart" here just makes sure that it runs kmeans 10 times. So, what we saw on the .GIF from step 0 to step 12 was 1 full run. By specifying "nstart = 10", we are asking kmeans to repeat these steps 10 times in a way if some of these 10 full runs gives us a suboptimal center of the clusters, it's still gonna return us the best results from these 10 runs so that we do not fall victim to the randomness side of the 1st step if run 1 time/ 1 full run. In short, it's doing the kmeans steps 10 times, and returning us the best results across those 10 attempts.
 
 mod_km
+
 ```
 
-Since the choice of k can be subjective, we will need to find an objective way to select the value of k that most properly represents our dataset.  
+Since the choice of k can be subjective, we will need to find an objective way to select the value of k that most properly represents our dataset.    
 
 ```{r choosing k - total error}
+
 # Total error x k
+
+
 
 ```
 
