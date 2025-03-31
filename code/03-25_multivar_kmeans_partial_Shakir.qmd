@@ -227,8 +227,13 @@ fviz_cluster(mod_km4,
              data = weather_norm
              )
 
+ggsave("../output/clustervalidation_class.png",
+       width = 7,
+       height = 5)  
+
 ```
   
+
 Notice how, behind the scenes, the fviz_cluster function ran a PCA and is showing us a plot with PCs 1 and 2 on the axis (same result as we obtained on the PCA analysis).   
 
 

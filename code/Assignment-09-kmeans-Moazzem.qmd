@@ -28,9 +28,11 @@ You will first need to watch (and code along with) the following k-means video:
 
   - Move this script into the `code` subfolder of your `10_multivar` project  
   - On this script, fill your name under the `title` section of the YAML  
-  - Go back to the class k-means script, choose a different number of k than what we did in class, and run it.    
-# Setup  
-```{r}
+  - Go back to the class k-means script, choose a different number of k than what we did in class, and run it.
+  
+### Setup    
+
+```{r setup}
 #| message: false
 #| warning: false
 
@@ -47,46 +49,98 @@ library(ggpmisc)
 ```
 
 
-# Importing data  
+### Importing data  
 
-```{r}
+```{r importing data, message=FALSE, warning=FALSE}
 weather <- read_csv("../data/weather_monthsum.csv")
-
-weather
 ```
 
-# Data warngling
+## Data warngling
 
-## Selecting only numerical variables
+### Selecting only numerical variables
 
-```{r selecting only numerical vars}
+```{r selecting only numerical vars, message=FALSE, warning=FALSE}
 weather_n <- weather %>%
   dplyr::select(-c(year:strength_gtex))
 
-weather_n
 ```
 
-## Normalizing data
+### Normalizing data
 
-```{r}
+```{r normalizing data, message=FALSE, warning=FALSE}
 
 # normalizing the data
 weather_norm  <- weather_n %>%
   mutate(across(everything(), ~scale(.)) )
 
-weather_norm
 
-summary(weather_norm) #Very important note: in the normalized data frame, the mean of all the variables are 0 [i.e., the mean of all variables are standardized around 0]
+```
+
+### Creating 5 clusters
+
+```{r mod_km5, message=FALSE, warning=FALSE}
+
+mod_km5 <- kmeans(weather_norm,
+                  centers = 5, #now we have 5 clusters
+                  nstart = 10
+                  )
 
 ```
 
 # Questions  
 ## 1. What number of k did you select? Why?  
 
+I selected 5 clusters because based on the clouds of data points in the PCA plot for PC1 vs PC2 obtained during the in-class "03-25_multivar_pca_partial_Shakir.qmd" exercise as shown below, it seems to me that the existence of 5 clusters may be very possible. 
+
+```{r embedding PC1 vs PC2 PCA plot, message=FALSE, warning=FALSE}
+
+knitr::include_graphics("../output/PC1vsPC2.png")
+
+```
+
+
 ## 2. How many observations are there in each cluster?  
+
+The number of observations in each cluster is given in the following table:
+
+```{r obs per cluster, message=FALSE, warning=FALSE}
+
+weather %>%
+  mutate(cluster = mod_km5$cluster) %>% #to create a column with cluster id
+  dplyr::select(year, site, cluster) %>%
+  group_by(cluster) %>%
+  tally() #To get the length of each of the cluster
+
+```
+
 
 ## 3. Using the `fviz_cluster()` function, import here the original plot with k=4 did in class, and the new one with the number of k you selected for this exercise. How do they visually compare? Which one seems to be a better choice, and why?  
 
+
+```{r original plot}
+
+knitr::include_graphics("../output/clustervalidation_class.png")
+
+```
+
+The original cluster plot with k = 4 as created in class is shown above.  
+
+```{r kmeans PCA plot}
+
+fviz_cluster(mod_km5,
+             data = weather_norm
+             )
+
+ggsave("../output/clustervalidation_assignment.png",
+       width = 7,
+       height = 5) 
+
+```
+The newly-created cluster plot with k = 5 for this assignment is shown above.  
+
+In terms of visual comparison, the cluster plot created in the class has 4 distinct clusters whereas the newly-created cluster plot in this assignment has 5 clusters. Also, it appears that there is no cluster overlapping one another in the cluster plot with 4 clusters created in the class, whereas at least two clusters are overlapping in the cluster plot with 5 clusters created in this assignment.
+
+It seems to me that choosing 4 clusters instead of 5 is a better choice because we are able to avoid overlapping of clusters when the number of cluster are selected as 4 (k = 4) instead of 5.
 
 # Submitting your work  
 Once you have developed all the code and answers, make sure to Render this quarto file.  

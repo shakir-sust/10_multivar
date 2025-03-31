@@ -564,8 +564,13 @@ Let's plot PC1 vs PC2 scores, look for any groupings.
 
 ```{r PC1 vs PC2}
 
-fviz_pca_ind(mod_pca,
+pcaplot <- fviz_pca_ind(mod_pca,
              label = F)
+
+ggsave("../output/PC1vsPC2.png",
+       height = 5,
+       width = 7,
+       bg = "white")
 
 ```
   
