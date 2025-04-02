@@ -408,22 +408,26 @@ Let's check the variance inflation factor (VIF) of both uncorrelated and correla
 
 ```{r vif uncorrelated}
 
-# Uncorrelated
+# Checking VIF of uncorrelated model
 lm(strength_gtex ~ mean_dayl.s_Apr + 
                   sum_prcp.mm_Oct,
    data = weather) %>%
-  vif()
+  vif() #vif(): calculates the VIF (Variance Inflation Factor) for each of the predictor variables
+
+#Since VIF ~ 1, this model does not suffer from multicollinearity
 
 ```
 
 
 ```{r vif correlated}
 
-# Correlated
+# Checking VIF of correlated model
 lm(strength_gtex ~ mean_dayl.s_Apr + 
                   mean_dayl.s_May,
    data = weather) %>%
-  vif()
+  vif() #vif(): calculates the VIF (Variance Inflation Factor) for each of the predictor variables
+
+#Since VIF = 64.59024, this model suffers from high multicollinearity
 
 ```
 
