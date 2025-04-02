@@ -98,6 +98,9 @@ Commonly not a "designed experiment" analysis, but an exploratory relationship a
 #install.packages("ggcorrplot")
 #install.packages("factoextra")
 #install.packages("ggpmisc")
+#install.packages("ggpmisc")
+#installed.packages("ggpubr")
+
 
 library(tidyverse)
 library(ggcorrplot) #helps to look into correlation of variables
@@ -105,6 +108,7 @@ library(broom)
 library(car)
 library(factoextra) #helps to look into some clustering functions
 library(ggpmisc) #helps make annotations in ggplots
+library(ggpubr) #package to load "stat_cor()" function; "stat_cor()": adds correlation coefficients with p-values to a scatter plot. Can be also used to add 'R2'.
 ```
 
 ```{r}
@@ -273,20 +277,24 @@ Multicollinearity is an issue because:
 
 ## Applied example  
 Let's select a few variables to run some tests.  
-Two uncorrelated variables:
+Two uncorrelated variables:  
+
 ```{r uncorrelated}
 
 #install.packages("ggpmisc")
 #library(ggpmisc)
+
+installed.packages("ggpubr")
+library(ggpubr)
 
 weather %>%
   ggplot(aes(x = mean_dayl.s_Apr, 
              y = sum_prcp.mm_Oct)) +
   geom_point() +
   geom_smooth(method="lm") +
-  stat_correlation(parse = F)
+  stat_cor() #Adds correlation coefficients with p-values to a scatter plot. Can be also used to add 'R2'.
 
-?stat_correlation()
+#?stat_cor()
 
 ```
 
@@ -298,7 +306,8 @@ weather %>%
   ggplot(aes(x = mean_dayl.s_Apr, 
              y = mean_dayl.s_May))+
   geom_point() +
-  geom_smooth(method="lm")
+  geom_smooth(method="lm") +
+  stat_cor()
 
 ```
 
@@ -310,7 +319,7 @@ lm_dayl.apr <- lm(strength_gtex ~ mean_dayl.s_Apr,
                   data = weather
                   ) %>%
   tidy() %>% #gives us the estimates i.e., (Intercept) and the slope (= mean_dayl.s_Apr)
-  filter(term != "(Intercept)") %>%
+  filter(term != "(Intercept)") %>% #to keep only the slopes of the model
   mutate(mod = "lm_dayl.apr")
 
 lm_dayl.apr
