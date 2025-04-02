@@ -431,6 +431,8 @@ lm(strength_gtex ~ mean_dayl.s_Apr +
 
 ```
 
+**Summary on multicollinearity:** If we have 2 or more highly correlated x/ predictor variables in our model, the model will suffer from multicollinearity, which is bad for us because we may obtain and interpret a different relationship than what actually is between our y and x variables. This is something that we want to avoid.  
+
 ## Dealing with multicollinearity  
 So what now?  
 How can we deal with correlated variables in a multivariate approach?  
@@ -450,30 +452,32 @@ In those cases, predictors with vastly different scales (e.g. mean_tmin.c_Jan fr
 
 Thus, our numerical predictor variables need to be normalized (center and scale) before starting our multivariate analysis.  
 
-Some analysis do the normalization for you (like PCA), and others don't (like k-means), so need to be aware of this to ensure data is normalized.  
+Some analysis do the normalization for you (e.g., PCA), and others don't (e.g., k-means), so need to be aware of this to ensure data is normalized.  
 
 Since both PCA and k-means only take numerical variables, let's select them now.  
 
 ```{r selecting only numerical vars}
 
 weather_n <- weather %>%
-  dplyr::select(-year, -site, -strength_gtex) #Along with year and site, we also want to remove the predictor variable
+  dplyr::select(-year, -site, -strength_gtex) #Along with year and site, we also want to remove the predicted/resposnse variable
 
 weather_n
 
 ```
 
 # PCA  
-Principal component analysis (PCA) is a dimensionality reduction approach that accomodates only numerical variables.  
+Principal component analysis (PCA) is a dimensionality reduction approach that accomodates only numerical variables. If we have a categorical variable, we are either gonna have to drop it, or maybe transform it into a dummy variable.  
 
 Finds linear relationships among predictors that can be represented in a lower number of uncorrelated dimensions.  
 
 Works well when at least some predictors are correlated.  
 
+[Note: If we give 72 predictors to PCA and ask it to calculate all the principal components, tha analysis itself is gonna us 72 principal components. It is gonna give us the same number of principal components as the number of predictors that we gave. PCA works well when we have many variables, and some of them are highly correlated (i.e., there is some level of correlation between those variables).]   
+
 PCA:  
 
 - Is used for dimensionality reduction  
-- Is an unsupervised analysis (no outcome i.e., no y variable is used in PCA)  
+- Is an unsupervised analysis (no outcome i.e., no y variable is used in PCA)  (only x variables are used)  
 - Only takes predictors  
 - Predictors need to be numerical  
 
@@ -483,19 +487,28 @@ Some PCA properties:
 
 - The overall variance explained by each PC is *greatest for PC1* and *decreases as PC number increases (e.g., PC72 will explain the least variance)*.  
 
-- All PCs are **orthogonal** (i.e., independent of each other).  
+- All PCs are **orthogonal** (i.e., All principal components are independent of each other and have 0 correlation between them).  
 
 - The goal is to select a small number of PCs that explain a minimum threshold of the total variance (e.g., 70%). [70% is a subjective number]  
 
 ```{r pca in action}
-knitr::include_graphics("https://miro.medium.com/v2/resize:fit:1200/1*V4H3Cu8qGr_90WANKSO9BA.gif") #copy paste this link in browser to see the animation
+
+download.file("https://miro.medium.com/v2/resize:fit:1200/1*V4H3Cu8qGr_90WANKSO9BA.gif",
+destfile = "cool_animation.gif", mode = "wb")
+
+knitr::include_graphics("cool_animation.gif")
+
+#knitr::include_graphics("https://miro.medium.com/v2/resize:fit:1200/1*V4H3Cu8qGr_90WANKSO9BA.gif") #copy paste this link in browser to see the animation
+
 ```
 
 Let's run PCA for our weather data.  
 
 ```{r pca model}
 
-mod_pca <- prcomp(weather_n, scale. = T) #scale. = T: to do scaling before the analysis
+mod_pca <- prcomp(weather_n, scale. = T) #prcomp(): stands for Principal Components #scale. = T: to do scaling before the analysis
+
+mod_pca
 
 ```
 
@@ -506,9 +519,11 @@ Based on scree plot (total variance):
 ```{r pca checking number of components}
 
 # Scree plot
-
 fviz_eig(mod_pca,
          addlabels = T)
+
+#PC1 will always explain the most variance, and that decreases until the last PC
+#fviz_eig() shows the "Percentage of explained variances" up to the 1st 10 PCs.
 
 ```
     
@@ -521,7 +536,7 @@ If wanted to use enough PCs to explain 70% of total variance, how many would we 
 
 mod_pca %>%
   get_eig() %>%
-  mutate(pc = 1:nrow(.)) %>%
+  mutate(pc = 1:nrow(.)) %>% #to create a new column named "pc" that will contain all the numbers of PCs (72 in this case)
   ggplot(aes(x = pc,
              y = cumulative.variance.percent)) +
   geom_bar(stat = "identity") +
