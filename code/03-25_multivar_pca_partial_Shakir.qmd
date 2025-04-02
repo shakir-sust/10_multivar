@@ -393,6 +393,8 @@ lm_dayl.apr %>% #starting with the 1st model
 
 What has happened with **mean_dayl.s_April** and **sum_prcp.mm_Oct** estimates and standard error when modeled i) alone, or with another uncorrelated variable vs. ii) with another correlated variable?  
 
+On multicollinear models, the direction and magnitude of that model estimates can change, which is NOT good and NOT something we want.
+
 One way to check the degree of multicollinearity between two predictos is with the *Variance Inflation Factor (VIF)*.  
 
 VIF values range from 1 to positive infinite.  
