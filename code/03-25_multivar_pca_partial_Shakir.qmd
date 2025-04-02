@@ -387,7 +387,7 @@ lm_dayl.apr %>% #starting with the 1st model
                       ymax = estimate + std.error #upper bound of the confidence level
                       )) +
   facet_wrap(~ term, scales = "free_y") + #scales = "free_y": to auto-adjust the scales of y axis
-  scale_x_discrete(guide = guide_axis(n.dodge = 2)) #to avoid overlapping of variable names along x axis
+  scale_x_discrete(guide = guide_axis(n.dodge = 2)) #to avoid overlapping of variable names along x axis #(n.dodge = 2): to dodge every other label
 
 ```
 
