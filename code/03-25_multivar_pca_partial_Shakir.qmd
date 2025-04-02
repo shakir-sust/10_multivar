@@ -160,12 +160,12 @@ A bit difficult to see because we have so many predictors, let's extract in tabl
 weather %>%
   dplyr::select(-year, -site) %>%
   cor() %>% # calculates r (-1 to 1)
-  as.data.frame() %>%
+  as.data.frame() %>% #to turn into a data frame
   rownames_to_column() %>% #to turn the rownames into a column
   pivot_longer(cols = -rowname) %>%
-  filter(abs(value) > .85 & value != 1) %>%
-  arrange(desc(value)) %>%
-  distinct(value, .keep_all = T)
+  filter(abs(value) > .85 & value != 1) %>% #to filter absolute values of correlation coefficients that are higher than .85 and not equal to 1
+  arrange(desc(value)) %>% #to arrange in descending order of correlation
+  distinct(value, .keep_all = T) #to keep the distinct values of correlation
 
 ```
 
@@ -177,7 +177,7 @@ weather %>%
   as.data.frame() %>%
   rownames_to_column() %>%
   pivot_longer(cols = -rowname) %>%
-  filter(abs(value) < .05 & value != 1) %>%
+  filter(abs(value) < .05 & value != 1) %>% #to filter absolute values of correlation coefficients that are less than .05 and not equal to 1
   arrange(abs(value)) %>%
   distinct(value, .keep_all = T)
 
