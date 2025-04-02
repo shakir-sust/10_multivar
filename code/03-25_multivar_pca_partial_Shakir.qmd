@@ -315,12 +315,12 @@ Now let's fit some models with one or two uncorrelated and correlated variables 
 
 ```{r strength ~ mean_dayl.s_Apr}
 
-lm_dayl.apr <- lm(strength_gtex ~ mean_dayl.s_Apr, 
+lm_dayl.apr <- lm(strength_gtex ~ mean_dayl.s_Apr, #model explaining fiber strength using "mean_dayl.s_Apr" as predictor variable
                   data = weather
                   ) %>%
-  tidy() %>% #gives us the estimates i.e., (Intercept) and the slope (= mean_dayl.s_Apr)
+  tidy() %>% #tidy(): gives us the estimates i.e., (Intercept) and the slope (= mean_dayl.s_Apr)
   filter(term != "(Intercept)") %>% #to keep only the slopes of the model
-  mutate(mod = "lm_dayl.apr")
+  mutate(mod = "lm_dayl.apr") #to create a new column "mod" which will contain the model name "mean_dayl.s_Apr"
 
 lm_dayl.apr
 
@@ -328,11 +328,11 @@ lm_dayl.apr
 
 ```{r strength ~ sum_prcp.mm_Oct}
 
-lm_prp.oct <- lm(strength_gtex ~ sum_prcp.mm_Oct,
+lm_prp.oct <- lm(strength_gtex ~ sum_prcp.mm_Oct, #model explaining fiber strength using "sum_prcp.mm_Oct" as predictor variable
    data = weather) %>%
-  tidy() %>%
-  filter(term!="(Intercept)") %>%
-  mutate(mod="lm_prp.oct")
+  tidy() %>% #tidy(): #gives us the estimates i.e., (Intercept) and the slope (= sum_prcp.mm_Oct)
+  filter(term!="(Intercept)") %>% #to keep only the slopes of the model
+  mutate(mod="lm_prp.oct") #to create a new column "mod" which will contain the model name "lm_prp.oct"
 
 lm_prp.oct
 
@@ -341,47 +341,53 @@ lm_prp.oct
 ```{r strength ~ mean_dayl.s_Apr + sum_prcp.mm_Oct}
 
 lm_dayl.prcp <- lm(strength_gtex ~ mean_dayl.s_Apr + 
-                   sum_prcp.mm_Oct,
+                   sum_prcp.mm_Oct, #model explaining fiber strength using 2 weather variables "mean_dayl.s_Apr" and "sum_prcp.mm_Oct" as predictor variables
    data = weather) %>%
-  tidy() %>%
-  filter(term != "(Intercept)") %>%
-  mutate(mod = "lm_2var.uncor")
+  tidy() %>% #tidy(): #gives us the estimates i.e., (Intercept) and the slopes (= mean_dayl.s_Apr, sum_prcp.mm_Oct)
+  filter(term != "(Intercept)") %>%  #to keep only the slopes of the models
+  mutate(mod = "lm_2var.uncor") #to create a new column "mod" which will contain the model name "lm_2var.uncor"
 
 lm_dayl.prcp
+
+#This model does not suffer from multidisciplinary because the two predictor variables "mean_dayl.s_Apr" and "sum_prcp.mm_Oct" are not correlated.
 
 ```
 
 ```{r strength ~ mean_dayl.s_Apr + mean_dayl.s_May}
 
 lm_daylapr.daylmay <- lm(strength_gtex ~ mean_dayl.s_Apr + 
-                  mean_dayl.s_May,
+                  mean_dayl.s_May, #model explaining fiber strength using 2 weather variables "mean_dayl.s_Apr" and "mean_dayl.s_May" as predictor variables
    data = weather) %>%
-  tidy() %>%
-  filter(term!="(Intercept)") %>%
-  mutate(mod="lm_2var.cor") #linear model with 2 variables correlated
+  tidy() %>% #tidy(): #gives us the estimates i.e., (Intercept) and the slopes (= mean_dayl.s_Apr, sum_prcp.mm_Oct)
+  filter(term!="(Intercept)") %>% #to keep only the slopes of the models
+  mutate(mod="lm_2var.cor") #to create a new column "mod" which will contain the model name "lm_2var.cor" 
 
 lm_daylapr.daylmay
 
+#We will expect this model to suffer from multidisciplinary because the two predictor variables "mean_dayl.s_Apr" and "mean_dayl.s_May" are highly correlated.
+
 ```
 
+
 ```{r Checking multicollinearity}
-lm_dayl.apr %>%
+
+lm_dayl.apr %>% #starting with the 1st model
   bind_rows(lm_prp.oct, 
             lm_dayl.prcp,
-            lm_daylapr.daylmay) %>%
+            lm_daylapr.daylmay) %>% #binding the names and statistics of rows for all models
   mutate(mod=factor(mod,
                     levels=c("lm_dayl.apr",
                              "lm_prp.oct",
                              "lm_2var.uncor",
-                             "lm_2var.cor"))) %>%
+                             "lm_2var.cor"))) %>% #transforming the "mod" column to factor
   filter(term != "mean_dayl.s_May") %>%
   ggplot(aes(x=mod)) +
-  geom_pointrange(aes(y = estimate,
-                      ymin = estimate - std.error,
-                      ymax = estimate + std.error
+  geom_pointrange(aes(y = estimate, #geom_pointrange(): creates a confidence level range around the estimate point
+                      ymin = estimate - std.error, #lower bound of the confidence level
+                      ymax = estimate + std.error #upper bound of the confidence level
                       )) +
   facet_wrap(~ term, scales = "free_y") + #scales = "free_y": to auto-adjust the scales of y axis
-  scale_x_discrete(guide = guide_axis(n.dodge = 2))
+  scale_x_discrete(guide = guide_axis(n.dodge = 2)) #to avoid overlapping of variable names along x axis
 
 ```
 
