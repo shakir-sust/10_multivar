@@ -176,7 +176,7 @@ weather %>%
   cor() %>% # calculates r (-1 to 1)
   as.data.frame() %>%
   rownames_to_column() %>%
-  pivot_longer(cols = -rowname) %>%
+  pivot_longer(cols = -rowname) %>% #pivoting longer everything except "rowname"
   filter(abs(value) < .05 & value != 1) %>% #to filter absolute values of correlation coefficients that are less than .05 and not equal to 1
   arrange(abs(value)) %>%
   distinct(value, .keep_all = T)
@@ -189,7 +189,7 @@ How do variables relate to fiber strength in a bivariate relationship?
 
 test <- weather %>%
   dplyr::select(-site, -year) %>%
-  pivot_longer(cols=-strength_gtex) %>%
+  pivot_longer(cols = -strength_gtex) %>% #pivoting longer everything except "strength_gtex"
   group_by(name) %>%
   nest() %>%
   mutate(r2 = map_dbl(data,
@@ -217,11 +217,11 @@ weather %>%
   pivot_longer(cols=-strength_gtex) %>%
   group_by(name) %>%
   nest() %>%
-  mutate(r2 = map_dbl(data,
+  mutate(r2 = map_dbl(data, #"map_dbl()" is another map function from map family of functions (from "purrr" package); map_dbl() returns double, whereas map() returns any object 
                   ~lm(strength_gtex ~ value,
                       data = .x) %>%
-                    glance(.) %>% #Extracts model metrics from any model
-                    pull(r.squared)
+                    glance(.) %>% #Extracts model fit metrics from any model
+                    pull(r.squared) #just to extract/pull only the value of R2
                   )) %>% #map_dbl() return a double
   arrange(desc(r2))
 
@@ -242,7 +242,7 @@ weather %>%
                   )) %>%
   arrange(desc(r2)) %>%
   ungroup() %>%
-  slice(1:6) %>% 
+  slice(1:6) %>% #to get only the 6 highest R2 values
   unnest(data) %>%
   ggplot(aes(x = value, 
              y = strength_gtex))+
@@ -266,9 +266,9 @@ Multicollinearity definition: more than two explanatory variables [i.e., predict
 
 Multicollinearity is an issue because:  
 
-- Model estimates magnitude and direction (+ or -) can change for multicollinear variables compared to a non-multicollinear model.  
+- Model estimates (e.g., slope, intercept) magnitude and direction (+ or -) can change for multicollinear variables compared to a non-multicollinear model.  
   
-- Model estimates standard error are inflated, directly affecting p-values, estimate significance, and power.  
+- Model estimates (e.g., slope, intercept) standard error are inflated, directly affecting p-values, estimate significance, and power.  
   
 
 ## Applied example  
