@@ -544,7 +544,7 @@ mod_pca %>%
 
 ```
     
-We would need 4 PCs.  
+We would need (at least) 4 PCs.  
 
 Normally we wish to use 2-3 PCs, but 4 is certainly better than 72 original variables.  
 
@@ -556,9 +556,9 @@ What are the weights that each variable received in this PC?
 
 ```{r PC1 weights}
 
-mod_pca$rotation %>%
-  as.data.frame() %>%
-  rownames_to_column(var = "var") %>%
+mod_pca$rotation %>% #getting "rotation" from PC model (mod_pca)
+  as.data.frame() %>% #transforming into a data frame
+  rownames_to_column(var = "var") %>% #turning the rows into columns
   ggplot(aes(x = reorder(var,desc(PC1)), 
              y = PC1))+
   geom_bar(stat = "identity", 
