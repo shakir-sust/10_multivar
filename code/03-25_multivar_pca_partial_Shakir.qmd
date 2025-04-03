@@ -702,7 +702,7 @@ ggplot(weather_postpca,
   stat_cor() #to show r and p-value on the graph
 
 ```
-There is no significant relationship between PC1 and "strength_gtex". [Remember: we did not give the y variable "strength_gtex" in the PCA (because it is an unsupervised method); PCA only say the weather variables.]
+There is no significant (p-value = 0.753) relationship between PC1 and "strength_gtex". ["Estimate" of slope for PC1 in the summary() function was positive: 0.007166] [Remember: we did not give the y variable "strength_gtex" in the PCA (because it is an unsupervised method); PCA only say the weather variables.]
 
 ```{r PC2 pca regression plots}
 # Plotting strength vs PC2
@@ -714,7 +714,7 @@ ggplot(weather_postpca,
 
 ```
 
-There is a significant positive relationship [slope in the summary() function was positive ] between PC2 and "strength_gtex" (although it is very noisy i.e., there is noise around the fitted curve).
+There is a significant (p-value = 3.72e-12) positive relationship ["Estimate" of slope for PC2 in the summary() function was positive: 0.185431] between PC2 and "strength_gtex" (although it is very noisy i.e., there is noise around the fitted curve).
 
 ```{r PC3 pca regression plots}
 
@@ -727,7 +727,7 @@ ggplot(weather_postpca,
 
 ```
 
-There is a significant negative relationship [slope in the summary() function was negative] between PC2 and "strength_gtex" (although it is very noisy i.e., there is noise around the fitted curve). The variables that had highest loads on PC1 were day lengths specially inversely the ones on the summer versus the winter. So, maybe the day lengths in summer versus winter is not very important in explaining "strength_gtex". May be that is one interpretation that we can bring back here when using the PCs to explain the response variable "strength_gtex".
+There is a significant (p-value = 6.54e-05) negative relationship ["Estimate"  of slope for PC3 in the summary() function was negative = -0.195071] between PC2 and "strength_gtex" (although it is very noisy i.e., there is noise around the fitted curve). The variables that had highest loads on PC1 were day lengths specially inversely the ones on the summer versus the winter. So, maybe the day lengths in summer versus winter is not very important in explaining "strength_gtex". May be that is one interpretation that we can bring back here when using the PCs to explain the response variable "strength_gtex".
 
 ```{r PC4 pca regression plots}
 
@@ -739,6 +739,7 @@ ggplot(weather_postpca,
   stat_cor()
 
 ```
+There is no significant (p-value = 0.474) negative relationship ["Estimate"  of slope for PC4 in the summary() function was positive = 0.049160] between PC2 and "strength_gtex
 
 Only PCs 2 and 3 explained strength (look at which variables were most important to each PC for interpretation).  
 
