@@ -68,7 +68,11 @@ k-means works by
 - repeats the entire process until cluster means stabilize  
 
 ```{r k-means in action}
-knitr::include_graphics("https://miro.medium.com/max/960/1*KrcZK0xYgTa4qFrVr0fO2w.gif")
+
+download.file("https://miro.medium.com/max/960/1*KrcZK0xYgTa4qFrVr0fO2w.gif",
+destfile = "k-means_in_action.gif", mode = "wb")
+
+knitr::include_graphics("k-means_in_action.gif")
 
 ```
 

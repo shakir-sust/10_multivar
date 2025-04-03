@@ -494,9 +494,9 @@ Some PCA properties:
 ```{r pca in action}
 
 download.file("https://miro.medium.com/v2/resize:fit:1200/1*V4H3Cu8qGr_90WANKSO9BA.gif",
-destfile = "cool_animation.gif", mode = "wb")
+destfile = "PCA_in_action.gif", mode = "wb")
 
-knitr::include_graphics("cool_animation.gif")
+knitr::include_graphics("PCA_in_action.gif")
 
 #knitr::include_graphics("https://miro.medium.com/v2/resize:fit:1200/1*V4H3Cu8qGr_90WANKSO9BA.gif") #copy paste this link in browser to see the animation
 
