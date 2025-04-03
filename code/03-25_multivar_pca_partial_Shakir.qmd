@@ -741,7 +741,9 @@ ggplot(weather_postpca,
 
 Only PCs 2 and 3 explained strength (look at which variables were most important to each PC for interpretation).  
 
-As expected, PCs were not multicollinear (VIF=1). This is a very important feature of PCA
+As expected, PCs were not multicollinear (VIF=1). All PCs will have a VIF of exactly 1. This is a very important feature of PCA.
+
+If we have a lot of variables, at first we run a PCA using all variables, then get the PC scores out of it, and then continue our further analysis using PC scores rahter than the original variables. 
 
 Note: Each Principal Component is a linear combination of all the 72 original variables. The number of the Principal Components that we get is equal to the number of original variables, so we have 72 total Principal Components. Always PC1 explains the most variability, and that decreases as the number of PCs increases.
 
