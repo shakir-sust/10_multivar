@@ -585,6 +585,20 @@ Let's check the eigenvectors for both PCs 1 and 2 variables:
 
 ```{r pca variable contribution }
 
+#Eigenvector of PC1 and PC2 for all variables
+pca_all <- fviz_pca_var(mod_pca, 
+             col.var = "contrib", # Color by contributions to the PC
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE,     # Avoid text overlapping,
+             )
+
+pca_all
+
+```
+
+```{r pca variable contribution }
+
+#Eigenvector of PC1 and PC2 for top 5 variables
 fviz_pca_var(mod_pca, 
              col.var = "contrib", # Color by contributions to the PC
              gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
@@ -596,12 +610,16 @@ fviz_pca_var(mod_pca,
   
 The longer is the eigenvector for a given variable, the more important it is towards that PC.  
 
-Let's plot PC1 vs PC2 scores, look for any groupings.  
+Interpretation: Each 2 arrows that are exactly going on the opposite direction, we can say that those 2 variables are inversely related when explained through PC1 and PC2.  Also, the longer is the arrow, the more important that specific variable is for that PC.
+
+Let's plot PC1 vs PC2 scores, look for any groupings. We will generate a PCA score plot. 
 
 ```{r PC1 vs PC2}
 
 pcaplot <- fviz_pca_ind(mod_pca,
-             label = F)
+             label = F) #fviz_pca_ind(): the "ind" stands for individual
+
+pcaplot
 
 ggsave("../output/PC1vsPC2.png",
        height = 5,
@@ -610,26 +628,36 @@ ggsave("../output/PC1vsPC2.png",
 
 ```
   
-Appears that some groups exist.  
+The PCA score plot is shown above. This is basically for PC1 and PC2, and taking all those weights, then multiplying those weights for all variabels for each one of our site years to get the PCA scores. Each point here is a site year for PC1 and PC2. This is a very popular plot in PCA analysis because it helps you to show basically 2 PCs which in this case represents 61.4% variance of the entire dataset in 2 dimensions. Even though this is only explaining 61.4% total variance of the data set with PC1 and PC2,  we can perhaps visually identify some clusters/groups, which can be useful for us to find site years that are similar on 72 dimensions but are hard for us to see the similarity. So, PCA score plot helps us to visualize that. 
 
+Appears that some groups exist.  
 
 What did we learn?  
 
 - Some original variables strongly correlated  
-- Need at least 4 PCs to cover ~70% of original variables variance  
-- Most important variables in PC1 were related to day length in winter and summer months [i.e., related to seasonality].  
+- Need at least 4 PCs to cover ~70% of original variables variance (for this data set; number of required PCs to cover ~ 70% of original variables variance will change for a different data set) 
+- Most important variables in PC1 were related to day length in winter and summer months [i.e., perhaps PC1 has some explanation/interpretation related to seasonality].  
+
+When is PCA not useful?
+
+- when the predictor variables are poorly correlated between themselves, PCA is not going to be very useful (because it's gonna say PC1 is explaining 10% and PC2 is explaining 5% variance, and so on). So, it is not very helpful if the original data does not have high correlation among the predictor variables/ x variables.   
 
 What now?  
+
+One of the most important properties of PCA is:  
+
+- All PCs are **orthogonal** (i.e., All principal components are orthogonal/independent/ non-multicollinear with each other and have 0 correlation between them).  
+
 Let's add the first 4 PCs to our original dataset and run a regression versus grain yield.    
 
 ```{r pca scores}
 
 # Extract first 4 PCs scores
-pca_scores <- mod_pca$x %>%
-  as.data.frame() %>%
-  dplyr::select(PC1:PC4)
+pca_scores <- mod_pca$x %>% #x is a metric of our PC
+  as.data.frame() %>% #to transform into a data frame
+  dplyr::select(PC1:PC4) #to get only the 1st 4 PCs
 
-pca_scores
+pca_scores #the reason we have 698 rows is because we have a score for each of the 4 PCs for each site year, which is derived by all site years for the actual values of all those weather variables, then multiplying them by each of the weights for that variable in that PC, and then adding up in the end all the results.  
 
 ```
 
@@ -637,7 +665,7 @@ pca_scores
 
 # Adding PCs 1-4 scores to original data set
 weather_postpca <- weather %>%
-  bind_cols(pca_scores) 
+  bind_cols(pca_scores) #to bind the columns of the PCA scores ("pca_scores" object) with our original data set; shows up as the last 4 columns
 
 # Regression of yield ~ PCs
 
@@ -649,7 +677,7 @@ lm_pca <- lm(strength_gtex ~ PC1 + PC2 + PC3 + PC4,
 summary(lm_pca)
 
 ```
-
+In this linear model, we used PC1, PC2, PC3, and PC4 as the predictor variables. We see from the output that PC2 and PC3 are statistically significantly (P < 0.001) explaining the y variable "strength_gtex", whereas PC1 and PC4 is not. 
 
 ```{r pca regression}
 
@@ -657,6 +685,8 @@ summary(lm_pca)
 vif(lm_pca) #All PC 's are orthogonal or independent PC s which is one of the main advantages of PCA
 
 ```
+
+From the output, we see that the VIF for all PC1, PC2, PC3, and PC4 is 1. This is one of the key advantages of Principal Component Analysis: all of our PCs (principal components) are orthogonal. If we were to include all 72 PCs in this model, they all would have a VIF of 1, this is a property of Principal Component Analysis. If we were to include all 72 weather variables, we are gonna have multicollinearity issue. This is one benefit of using PCA for data set containing variables that are highly correlated: to have orthogonal/independent PCs.   
 
 ```{r PC1 pca regression plots}
 
@@ -667,19 +697,23 @@ ggplot(weather_postpca,
            )
        ) +
   geom_point() +
-  geom_smooth(method = "lm")
+  geom_smooth(method = "lm") +
+  stat_cor() #to show r and p-value on the graph
 
 ```
-
+There is no significant relationship between PC1 and "strength_gtex". [Remember: we did not give the y variable "strength_gtex" in the PCA (because it is an unsupervised method); PCA only say the weather variables.]
 
 ```{r PC2 pca regression plots}
 # Plotting strength vs PC2
 ggplot(weather_postpca, 
        aes(x = PC2, y = strength_gtex))+
   geom_point()+
-  geom_smooth(method = "lm")
+  geom_smooth(method = "lm") +
+  stat_cor()
 
 ```
+
+There is a significant positive relationship [slope in the summary() function was positive ] between PC2 and "strength_gtex" (although it is very noisy i.e., there is noise around the fitted curve).
 
 ```{r PC3 pca regression plots}
 
@@ -687,23 +721,27 @@ ggplot(weather_postpca,
 ggplot(weather_postpca, 
        aes(x = PC3, y = strength_gtex))+
   geom_point()+
-  geom_smooth(method = "lm")
+  geom_smooth(method = "lm") +
+  stat_cor()
 
 ```
 
+There is a significant negative relationship [slope in the summary() function was negative] between PC2 and "strength_gtex" (although it is very noisy i.e., there is noise around the fitted curve). The variables that had highest loads on PC1 were day lengths specially inversely the ones on the summer versus the winter. So, maybe the day lengths in summer versus winter is not very important in explaining "strength_gtex". May be that is one interpretation that we can bring back here when using the PCs to explain the response variable "strength_gtex".
+
 ```{r PC4 pca regression plots}
 
-# Plotting strength vs PC3
+# Plotting strength vs PC4
 ggplot(weather_postpca, 
        aes(x = PC4, y = strength_gtex))+
   geom_point()+
-  geom_smooth(method = "lm")
+  geom_smooth(method = "lm") +
+  stat_cor()
 
 ```
 
 Only PCs 2 and 3 explained strength (look at which variables were most important to each PC for interpretation).  
 
-As expected, PCs were not multicollinear (VIF=1).  
+As expected, PCs were not multicollinear (VIF=1). This is a very important feature of PCA
 
 Note: Each Principal Component is a linear combination of all the 72 original variables. The number of the Principal Components that we get is equal to the number of original variables, so we have 72 total Principal Components. Always PC1 explains the most variability, and that decreases as the number of PCs increases.
 
