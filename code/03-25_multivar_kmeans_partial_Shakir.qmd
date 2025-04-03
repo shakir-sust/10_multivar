@@ -54,7 +54,7 @@ The EDA here is the same as for the PCA script, refer to that if needed.
 
 ***Supervised algorithm:*** We provide the y variable (aka label in ML) that we are trying to predict to the algorithm. We give the information on y variable that we are trying to predict to the model. E.g., we are trying to predict fiber strength using all 72 weather realated variables. Since fiber strength is the y variable on the formula, this is the supervised algorithm because we are giving the y variable to the algorithm. 
 
-***Unsupervised algorithm:*** We do not provide the y variable (aka label in ML) [Along with k-means, PCA is one example of unsupervised because no y variable was given in PCA]
+***Unsupervised algorithm:*** We do not provide the y variable (aka label in ML) [Along with k-means, PCA is another example of unsupervised because no y variable was given in PCA]
 
 # k-means  
 k-means is an **unsupervised** clustering algorithm and partitions the data into k groups, where k is defined by the user.  
@@ -79,33 +79,49 @@ knitr::include_graphics("k-means_in_action.gif")
 k-means:  
 
 - Is used for clustering  
-- Is an unsupervised analysis (no outcome)  
-- Only takes predictors  
+- Is an unsupervised analysis (no outcome since we do not give any label/y variable)  
+- Only takes predictors (only takes x variables) 
 - Predictors need to be numerical (no categorical variables)  
 - *Does not handle NAs i.e., missing values* 
 
+
+Very Important Note: 
 
 *k-means is useful when clusters are circular, but can fail badly when clusters have odd shapes or outliers.*    
 
 ```{r clustering algorithms comparison}
 
-knitr::include_graphics("https://miro.medium.com/max/1400/1*oNt9G9UpVhtyFLDBwEMf8Q.png")
+download.file("https://miro.medium.com/max/1400/1*oNt9G9UpVhtyFLDBwEMf8Q.png",
+destfile = "clustering_algorithms_comparison.png", mode = "wb")
+
+knitr::include_graphics("clustering_algorithms_comparison.png")
+
+#knitr::include_graphics("https://miro.medium.com/max/1400/1*oNt9G9UpVhtyFLDBwEMf8Q.png")
 
 ```
 
-k-means does not normalize our data for us like PCA did, so we will need to do that before running the model.  
+Very Important Note:
+
+*k-means does not normalize our data for us like PCA did, so we will need to do that before running the model.*    
+
+**Centering:** making sure our variables are centered around 0, basically taking the current value substracting it from the mean of the column.  
+
+**Scaling:** making sure our standard deviation of any particular column is equal to 1 (1 unit standard deviation).
+
 
 ```{r}
 
 # normalizing the data
 weather_norm  <- weather_n %>%
-  mutate(across(everything(), ~scale(.)) )
+  mutate(across(everything(), ~scale(.x)) ) #everything(): to select all the columns in the dataset #~scale(.x): to scale (normalize) all the columns
 
 weather_norm
 
 summary(weather_norm) #Very important note: in the normalized data frame, the mean of all the variables are 0 [i.e., the mean of all variables are standardized around 0]
 
 ```
+
+Due to normalization, all variables in the output have a mean of 0, and their standard deviation is gonna be around that mean of 0.  
 
 Also, we need to define the number of clusters we want.    
 
