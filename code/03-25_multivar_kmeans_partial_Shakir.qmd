@@ -133,7 +133,7 @@ Let's try 2.
 
 # Very Important Note:
 
-The 1st step of every kmeans run of the algorithm is that it's gonna pull 6 random observations (because we have 6 centers) from our dataset, and have those as starting centers of the clusters, and then it's gonna iterate to find the best solution. But the 1st step was always a random selection of 6 observations. Because it has this randomness component to it, it could happne that we may -- by random chance -- select 6 of the observations that are from the same specific place of the 72 dimensional place of our data, that once kmeans finishes the exercise, it may not find the actual most appropriate center of those clusters. Let's say, If our 6 random cluster centers are all clustered on 1 side of the data distribution, it may be difficult for us to spread them out in a way that makes sense and find all the proper cluster centers. Again, it has the randomness component in the 1st step, and for us to avoid that we get an answer from kmeans that was impacted/affected by the random selection of the initial centers. "nstart" here just makes sure that it runs kmeans 10 times. So, what we saw on the .GIF from step 0 to step 12 was 1 full run. By specifying "nstart = 10", we are asking kmeans to repeat these steps 10 times in a way if some of these 10 full runs gives us a suboptimal center of the clusters, it's still gonna return us the best results from these 10 runs so that we do not fall victim to the randomness side of the 1st step if run 1 time/ 1 full run. In short, by specifying "nstart = 10", it's doing the kmeans steps 10 times, and returning us the best results across those 10 attempts.  
+The 1st step of every kmeans run of the algorithm is that it's gonna pull 6 random observations (because we have 6 centers: "centers = 6" argument inside kmeans() function) from our dataset, and have those as starting centers of the clusters, and then it's gonna iterate to find the best solution. But the 1st step was always a random selection of 6 observations. **Because it has this randomness component to it, it could happen that we may -- by random chance -- select 6 of the observations that are from the same specific place of the 72 dimensional place of our data**, that once kmeans finishes running the exercise, it may not find the actual most appropriate center of those clusters. Let's say, If our 6 random cluster centers are all clustered on 1 side of the data distribution, it may be difficult for us to spread them out in a way that makes sense and find all the proper cluster centers. Again, it has the randomness component in the 1st step, and for us to avoid that we get an answer from kmeans that was impacted/affected by the random selection of the initial centers: "nstart" here just makes sure that it runs kmeans 10 times. So, what we saw on the .GIF from step 0 to step 12 was 1 full run. By specifying "nstart = 10", we are asking kmeans to repeat these steps 10 times in a way if some of these 10 full runs gives us a suboptimal center of the clusters, it's still gonna return us the best results from these 10 runs so that we do not fall victim to the randomness side of that 1st step if run 1 time/ 1 full run. In short, by specifying "nstart = 10", it's doing the kmeans steps 10 times, and returning us the best results across those 10 attempts.  
 
 ```{r kmeans model }
 
@@ -142,7 +142,7 @@ mod_km <- kmeans(weather_norm,
                  nstart = 10 
                  )
 
-#The 1st step of every kmeans run of the algorithm is that it's gonna pull 6 random observations (because we have 6 centers) from our dataset, and have those as starting centers of the clusters, and then it's gonna iterate to find the best solution. But the 1st step was always a random selection of 6 observations. Because it has this randomness component to it, it could happne that we may -- by random chance -- select 6 of the observations that are from the same specific place of the 72 dimensional place of our data, that once kmeans finishes the exercise, it may not find the actual most appropriate center of those clusters. Let's say, If our 6 random cluster centers are all clustered on 1 side of the data distribution, it may be difficult for us to spread them out in a way that makes sense and find all the proper cluster centers. Again, it has the randomness component in the 1st step, and for us to avoid that we get an answer from kmeans that was impacted/affected by the random selection of the initial centers. "nstart" here just makes sure that it runs kmeans 10 times. So, what we saw on the .GIF from step 0 to step 12 was 1 full run. By specifying "nstart = 10", we are asking kmeans to repeat these steps 10 times in a way if some of these 10 full runs gives us a suboptimal center of the clusters, it's still gonna return us the best results from these 10 runs so that we do not fall victim to the randomness side of the 1st step if run 1 time/ 1 full run. In short, it's doing the kmeans steps 10 times, and returning us the best results across those 10 attempts.
+#The 1st step of every kmeans run of the algorithm is that it's gonna pull 6 random observations (because we have 6 centers: "centers = 6" argument inside kmeans() function) from our dataset, and have those as starting centers of the clusters, and then it's gonna iterate to find the best solution. But the 1st step was always a random selection of 6 observations. **Because it has this randomness component to it, it could happen that we may -- by random chance -- select 6 of the observations that are from the same specific place of the 72 dimensional place of our data**, that once kmeans finishes running the exercise, it may not find the actual most appropriate center of those clusters. Let's say, If our 6 random cluster centers are all clustered on 1 side of the data distribution, it may be difficult for us to spread them out in a way that makes sense and find all the proper cluster centers. Again, it has the randomness component in the 1st step, and for us to avoid that we get an answer from kmeans that was impacted/affected by the random selection of the initial centers: "nstart" here just makes sure that it runs kmeans 10 times. So, what we saw on the .GIF from step 0 to step 12 was 1 full run. By specifying "nstart = 10", we are asking kmeans to repeat these steps 10 times in a way if some of these 10 full runs gives us a suboptimal center of the clusters, it's still gonna return us the best results from these 10 runs so that we do not fall victim to the randomness side of that 1st step if run 1 time/ 1 full run. In short, by specifying "nstart = 10", it's doing the kmeans steps 10 times, and returning us the best results across those 10 attempts. 
 
 mod_km
 
@@ -155,9 +155,9 @@ Since the choice of k can be subjective, we will need to find an objective way t
 # Total error x k
 
 fviz_nbclust(weather_norm,
-             method = "wss", #wss = Within Sum of Squares method
-             k.max = 10,
-             FUNcluster = kmeans #To specify what is the function that we want to use find those clusters
+             method = "wss", #wss = "Within Sum of Squares" method
+             k.max = 10, #k.max = to specify the maximum number of k's that we allow the algorithm to compute
+             FUNcluster = kmeans #To specify what is the function that we want to use to find those clusters: in this case "kmeans"
              )
 
 
@@ -179,15 +179,15 @@ fviz_nbclust(weather_norm,
 
 Silhouette width is a very popular metric to select the number of clusters. In the Silhouette plot, we want the "Average silhouette width" to be as high as possible, because it means that our observations in that cluster have a larger level of similarity within the cluster. In this case, the algorithm is recommending us to have 4 number of clusters which matches with the highest silhouette width within the number of k's that we created.
 
-total error: k=3-4  
-silhouette: k=4  
+total error: k = somewhere between 3 and 5 (since the elbow happens from 3 to 5)  
+silhouette: k = 4  
 
 Let's go with 4 clusters.  
 
 ```{r mod_km4 }
 
 mod_km4 <- kmeans(weather_norm,
-                  centers = 4, #now we have 4 clusters instead of 6
+                  centers = 4, #now we specify 4 clusters (instead of 6) as per silhouette width
                   nstart = 10
                   )
 
@@ -200,9 +200,9 @@ How many observations per cluster?
 ```{r}
 
 weather %>%
-  mutate(cluster = mod_km4$cluster) %>% #to create a column with cluster id
-  dplyr::select(year, site, cluster) %>%
-  group_by(cluster) %>%
+  mutate(cluster = mod_km4$cluster) %>% #to create a column which will indicate the cluster id/number for each cluster, which will be a vector ("cluster" vector) coming from the kmeans model fit which we previously assigned as "mod_km4"
+  dplyr::select(year, site, cluster) %>% #each year and site has a cluster id
+  group_by(cluster) %>% #to know/group by how many observations we have per cluster
   tally() #To get the length of each of the cluster
 
 ```
@@ -255,6 +255,8 @@ ggsave("../output/clustervalidation_class.png",
   
 
 Notice how, behind the scenes, the fviz_cluster function ran a PCA and is showing us a plot with PCs 1 and 2 on the axis (same result as we obtained on the PCA analysis).   
+
+[Note: If we had any disconnected weird-looking cluster (e.g., elliptical shaped), may be that would mean that we had issue of multicollinearity, so perhaps it would have been better to have buile the kmenas algorithm in terms of PCs instead of the original variables]
 
 
 # Summary  
