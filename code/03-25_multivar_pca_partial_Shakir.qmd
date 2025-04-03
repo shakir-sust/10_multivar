@@ -583,6 +583,7 @@ fviz_contrib(mod_pca,
   
 Let's check the eigenvectors for both PCs 1 and 2 variables:  
 
+
 ```{r pca variable contribution }
 
 #Eigenvector of PC1 and PC2 for all variables
@@ -608,7 +609,7 @@ fviz_pca_var(mod_pca,
 
 ```
   
-The longer is the eigenvector for a given variable, the more important it is towards that PC.  
+This plot is knows as PC bi-plot, this plot is important to understand how variables are impacting PC1 and PC2 in which direction. The longer is the eigenvector for a given variable, the more important it is towards that PC.  
 
 Interpretation: Each 2 arrows that are exactly going on the opposite direction, we can say that those 2 variables are inversely related when explained through PC1 and PC2.  Also, the longer is the arrow, the more important that specific variable is for that PC.
 
@@ -628,7 +629,7 @@ ggsave("../output/PC1vsPC2.png",
 
 ```
   
-The PCA score plot is shown above. This is basically for PC1 and PC2, and taking all those weights, then multiplying those weights for all variabels for each one of our site years to get the PCA scores. Each point here is a site year for PC1 and PC2. This is a very popular plot in PCA analysis because it helps you to show basically 2 PCs which in this case represents 61.4% variance of the entire dataset in 2 dimensions. Even though this is only explaining 61.4% total variance of the data set with PC1 and PC2,  we can perhaps visually identify some clusters/groups, which can be useful for us to find site years that are similar on 72 dimensions but are hard for us to see the similarity. So, PCA score plot helps us to visualize that. 
+The PCA score plot is shown above, which is important to see if we can observe some groupings. This is basically for PC1 and PC2, and taking all those weights, then multiplying those weights for all variables for each one of our site years to get the PCA scores. Each point here is a site year for PC1 and PC2. This is a very popular plot in PCA analysis because it helps you to show basically 2 PCs which in this case represents 61.4% variance of the entire dataset in 2 dimensions. Even though this is only explaining 61.4% total variance of the data set with PC1 and PC2,  we can perhaps visually identify some clusters/groups, which can be useful for us to find site years that are similar on 72 dimensions but are hard for us to see the similarity. So, PCA score plot helps us to visualize that. 
 
 Appears that some groups exist.  
 
@@ -745,7 +746,9 @@ As expected, PCs were not multicollinear (VIF=1). All PCs will have a VIF of exa
 
 If we have a lot of variables, at first we run a PCA using all variables, then get the PC scores out of it, and then continue our further analysis using PC scores rahter than the original variables. 
 
-Note: Each Principal Component is a linear combination of all the 72 original variables. The number of the Principal Components that we get is equal to the number of original variables, so we have 72 total Principal Components. Always PC1 explains the most variability, and that decreases as the number of PCs increases.
+*Very Important Note:*   
+
+**Each Principal Component is a linear combination of all the 72 original variables. The number of the Principal Components that we get is equal to the number of original variables, so we have 72 total Principal Components. Always PC1 explains the most variability, and that decreases as the number of PCs increases.**
 
 # Summary  
 In this exercise, we covered:  
